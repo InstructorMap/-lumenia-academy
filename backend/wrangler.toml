@@ -1,0 +1,9 @@
+name = "lumenia-api"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+# Create D1 first, then uncomment and replace the ID:
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "lumenia-db"
+# database_id = "REPLACE_WITH_REAL_D1_DATABASE_ID"
