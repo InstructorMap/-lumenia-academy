@@ -1,0 +1,18 @@
+PRAGMA foreign_keys = ON;
+CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY,email TEXT NOT NULL UNIQUE,display_name TEXT NOT NULL,role TEXT NOT NULL DEFAULT 'student' CHECK(role IN ('student','teacher','admin')),created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS courses (id TEXT PRIMARY KEY,slug TEXT NOT NULL UNIQUE,title TEXT NOT NULL,summary TEXT NOT NULL DEFAULT '',category TEXT NOT NULL DEFAULT '',status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','published','archived')),price_ars INTEGER NOT NULL DEFAULT 10000 CHECK(price_ars>=0),created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS modules (id TEXT PRIMARY KEY,course_id TEXT NOT NULL REFERENCES courses(id) ON DELETE CASCADE,title TEXT NOT NULL,position INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS lessons (id TEXT PRIMARY KEY,module_id TEXT NOT NULL REFERENCES modules(id) ON DELETE CASCADE,title TEXT NOT NULL,body TEXT NOT NULL DEFAULT '',position INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS enrollments (id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),course_id TEXT NOT NULL REFERENCES courses(id),status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active','revoked')),created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,UNIQUE(user_id,course_id));
+CREATE TABLE IF NOT EXISTS lesson_progress (user_id TEXT NOT NULL REFERENCES users(id),lesson_id TEXT NOT NULL REFERENCES lessons(id),completed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(user_id,lesson_id));
+CREATE TABLE IF NOT EXISTS exams (id TEXT PRIMARY KEY,course_id TEXT NOT NULL REFERENCES courses(id),title TEXT NOT NULL,pass_percent INTEGER NOT NULL DEFAULT 70 CHECK(pass_percent BETWEEN 0 AND 100),max_attempts INTEGER NOT NULL DEFAULT 3 CHECK(max_attempts>0));
+CREATE TABLE IF NOT EXISTS questions (id TEXT PRIMARY KEY,exam_id TEXT NOT NULL REFERENCES exams(id) ON DELETE CASCADE,prompt TEXT NOT NULL,position INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS question_options (id TEXT PRIMARY KEY,question_id TEXT NOT NULL REFERENCES questions(id) ON DELETE CASCADE,label TEXT NOT NULL,is_correct INTEGER NOT NULL DEFAULT 0 CHECK(is_correct IN (0,1)));
+CREATE TABLE IF NOT EXISTS exam_attempts (id TEXT PRIMARY KEY,exam_id TEXT NOT NULL REFERENCES exams(id),user_id TEXT NOT NULL REFERENCES users(id),score_percent INTEGER NOT NULL CHECK(score_percent BETWEEN 0 AND 100),passed INTEGER NOT NULL CHECK(passed IN (0,1)),created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS certificates (id TEXT PRIMARY KEY,course_id TEXT NOT NULL REFERENCES courses(id),user_id TEXT NOT NULL REFERENCES users(id),verification_code TEXT NOT NULL UNIQUE,issued_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,revoked_at TEXT);
+CREATE TABLE IF NOT EXISTS payments (id TEXT PRIMARY KEY,user_id TEXT NOT NULL REFERENCES users(id),course_id TEXT NOT NULL REFERENCES courses(id),provider TEXT NOT NULL DEFAULT 'mercadopago',provider_payment_id TEXT UNIQUE,status TEXT NOT NULL DEFAULT 'pending',amount_ars INTEGER NOT NULL CHECK(amount_ars>=0),created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE IF NOT EXISTS source_documents (id TEXT PRIMARY KEY,drive_file_id TEXT NOT NULL UNIQUE,title TEXT NOT NULL,rights_status TEXT NOT NULL DEFAULT 'unverified' CHECK(rights_status IN ('unverified','authorized','restricted')),course_id TEXT REFERENCES courses(id));
+CREATE INDEX IF NOT EXISTS idx_modules_course ON modules(course_id,position);
+CREATE INDEX IF NOT EXISTS idx_lessons_module ON lessons(module_id,position);
+CREATE INDEX IF NOT EXISTS idx_enrollments_user ON enrollments(user_id);
+CREATE INDEX IF NOT EXISTS idx_attempts_user_exam ON exam_attempts(user_id,exam_id);
