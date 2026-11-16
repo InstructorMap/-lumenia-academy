@@ -18,10 +18,12 @@ async function auth(mode){const email=$("email").value.trim(),password=$("passwo
 $("login").addEventListener("click",()=>auth("login"));$("signup").addEventListener("click",()=>auth("signup"));$("logout").addEventListener("click",async()=>{await supabase.auth.signOut();$("classroom").hidden=true;await refresh()});supabase.auth.onAuthStateChange(()=>{setTimeout(refresh,0)});refresh();
 const TAROT="fe81909b-1033-4398-b2b5-f73dc8612714";
 let examData=null;
+function resetExamUI(){examData=null;$("exam-questions").replaceChildren();$("exam-submit").hidden=true;$("exam-submit").disabled=false;$("exam-result").textContent=""}
+
 $("exam-load").onclick=async()=>{
- $("exam-result").textContent="Preparando evaluación…";
- const {data,error}=await supabase.rpc("lumenia_tarot_exam",{p_answers:null});
- if(error){$("exam-result").textContent="No se pudo cargar: "+error.message;return}
+ $("exam-load").disabled=true;$("exam-result").textContent="Preparando evaluación…";
+ let data,error;try{({data,error}=await supabase.rpc("lumenia_tarot_exam",{p_answers:null}))}catch(e){error=e}finally{$("exam-load").disabled=false}
+ if(error||!data||!Array.isArray(data.questions)){$("exam-result").textContent="No se pudo cargar: "+(error?.message||"respuesta inesperada");return}
  examData=data;$("exam-questions").replaceChildren();
  $("exam-result").textContent="Intentos utilizados: "+data.attempts+" de "+data.max_attempts+". Aprobación: "+data.pass_percent+"%.";
  for(const [i,q] of data.questions.entries()){
@@ -29,7 +31,7 @@ $("exam-load").onclick=async()=>{
   for(const option of q.options){const label=el("label");label.style.display="block";label.style.margin="10px 0";const input=document.createElement("input");input.type="radio";input.name="exam-"+q.id;input.value=option.id;input.style.display="inline";input.style.width="auto";input.style.marginRight="10px";label.append(input,document.createTextNode(option.label));field.append(label)}
   $("exam-questions").append(field)
  }
- $("exam-submit").hidden=data.attempts>=data.max_attempts;
+ $("exam-submit").hidden=data.attempts>=data.max_attempts||data.questions.length===0;if(data.attempts>=data.max_attempts)$("exam-result").textContent+=" Se agotaron los intentos disponibles.";
 };
 $("exam-submit").onclick=async()=>{
  if(!examData)return;
@@ -37,9 +39,8 @@ $("exam-submit").onclick=async()=>{
  for(const q of examData.questions){const choice=document.querySelector('input[name="exam-'+q.id+'"]:checked');if(!choice){$("exam-result").textContent="Respondé todas las preguntas antes de entregar.";return}answers[q.id]=choice.value}
  if(!confirm("¿Confirmás la entrega del examen? Este intento quedará registrado."))return;
  $("exam-submit").disabled=true;
- const {data,error}=await supabase.rpc("lumenia_tarot_exam",{p_answers:answers});
- $("exam-submit").disabled=false;
- if(error){$("exam-result").textContent="No se pudo entregar: "+error.message;return}
+ let data,error;try{({data,error}=await supabase.rpc("lumenia_tarot_exam",{p_answers:answers}))}catch(e){error=e}finally{$("exam-submit").disabled=false}
+ if(error||!data){$("exam-result").textContent="No se pudo entregar: "+(error?.message||"sin respuesta del servidor");return}
  $("exam-result").textContent=(data.passed?"Aprobado":"Aún no aprobado")+" · "+data.score+"% · "+data.correct+"/"+data.total+" respuestas correctas · intento "+data.attempts+".";
  $("exam-submit").hidden=true;$("exam-questions").replaceChildren();examData=null;
 };
