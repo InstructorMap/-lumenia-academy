@@ -96,3 +96,37 @@ header .brand{gap:7px;letter-spacing:.09em}
 .faq details p{color:#657282;line-height:1.75;font-size:14px}
 @media(max-width:850px){.hero .art{min-height:0}.hero-photo{height:auto;max-height:none}.community{grid-template-columns:1fr;gap:22px}.trust-strip{grid-template-columns:1fr 1fr}}
 @media(max-width:540px){.hero .art{min-height:0}.trust-strip,.faq-grid{grid-template-columns:1fr}.community,.faq{padding:70px 22px}.community-card{padding:26px}}
+
+
+/* YUNA · Visual system v4 */
+:root{--ink:#263347;--cream:#f9f7f3;--navy:#263347;--gold:#a57c4d;--muted:#687688}
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;-webkit-font-smoothing:antialiased}
+header{max-width:none;min-height:94px;gap:24px}
+header .brand{display:flex;align-items:center;gap:14px;letter-spacing:0;flex-shrink:0}
+header .brand-logo{width:158px!important;height:78px!important;object-fit:contain!important;object-position:center!important;border-radius:0!important}
+.brand-tagline{font:600 11px/1.4 system-ui;color:#8d7353;letter-spacing:.08em;border-left:1px solid #dfd3c4;padding-left:14px;max-width:125px;white-space:normal}
+header nav a{padding:9px 0;position:relative}
+header nav a:after{content:"";position:absolute;left:0;bottom:1px;width:0;height:2px;background:var(--gold);transition:width .2s}
+header nav a:hover:after{width:100%}
+.hero{max-width:1450px;margin:auto;min-height:630px;grid-template-columns:1.02fr .98fr}
+.hero-text{padding:75px 7% 65px 9%}
+.hero h1{max-width:740px;font-size:clamp(43px,5vw,73px)}
+.hero .art{background:#f3ece1!important;display:flex!important;align-items:center;justify-content:center;min-height:580px;overflow:hidden;padding:20px!important}
+.hero-photo{width:100%;height:auto;max-height:620px;object-fit:contain!important;object-position:center;display:block;filter:drop-shadow(0 20px 30px #2633470d)}
+.hero .art:before,.hero .art:after{display:none!important}
+.hero .features{margin-top:36px}
+.about,.catalog,.method,.community,.faq{scroll-margin-top:110px}
+.about{padding-top:110px;padding-bottom:100px}
+.about h2,.catalog h2,.method h2,.community h2,.faq h2{letter-spacing:-.03em}
+.course{border-radius:20px;box-shadow:0 10px 34px #2633470b;position:relative}
+.course-image{aspect-ratio:1.6;object-fit:cover;transition:transform .3s}
+.course:hover .course-image{transform:scale(1.025)}
+.course .category{font-size:11px;font-weight:800}
+.course h3{font-size:clamp(23px,2.2vw,28px);line-height:1.22}
+.course-link{display:inline-flex;align-items:center;padding:9px 0;margin-top:4px}
+.method .steps article{box-shadow:0 10px 30px #26334708}
+.faq details[open]{background:#fff;box-shadow:0 10px 30px #26334709}
+.faq summary:focus-visible,.filters button:focus-visible,a:focus-visible{outline:3px solid #b7925e;outline-offset:4px}
+@media(max-width:1150px){.brand-tagline{display:none}header nav{gap:16px}.hero-text{padding-left:7%}}
+@media(max-width:850px){header{min-height:78px}.hero{min-height:0}.hero-text{padding:75px 7% 48px}.hero .art{min-height:0;padding:20px!important}.hero-photo{max-height:none;width:100%;height:auto}}
+@media(max-width:540px){header .brand-logo{width:126px!important;height:62px!important}.hero-text{padding:52px 22px 42px}.hero h1{font-size:clamp(40px,10vw,52px)}.hero .art{padding:12px!important}.course h3{font-size:25px}.about{padding:75px 22px}.faq details{padding:18px}}
