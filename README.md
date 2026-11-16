@@ -1,4 +1,4 @@
-# LUMENIA Academy
+# YUNA Academy
 
 Academia digital de conocimiento y bienestar.
 
