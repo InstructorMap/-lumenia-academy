@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "brand": "YUNA Academy / YUNA Sound Holistic",
+  "assets": [
+    {
+      "path": "assets/branding/logo_referencia.png",
+      "role": "logo_reference",
+      "review": "confirmar logo oficial, transparencia y derechos"
+    },
+    {
+      "path": "assets/branding/icono_app_referencia.png",
+      "role": "app_icon_reference",
+      "review": "verificar versión final"
+    },
+    {
+      "path": "assets/branding/file_00000000bc98820e81cf96aab0d1dfa7.png",
+      "role": "brand_asset",
+      "review": "clasificar visualmente"
+    },
+    {
+      "path": "assets/cursos/tarot.png",
+      "role": "course_cover",
+      "course": "tarot",
+      "review": "comprobar oferta y derechos"
+    },
+    {
+      "path": "assets/cursos/reiki.png",
+      "role": "course_cover",
+      "course": "reiki",
+      "review": "comprobar oferta y derechos"
+    },
+    {
+      "path": "assets/cursos/meditacion.png",
+      "role": "course_cover",
+      "course": "meditacion",
+      "review": "comprobar oferta y derechos"
+    },
+    {
+      "path": "assets/cursos/aromaterapia.png",
+      "role": "course_cover",
+      "course": "aromaterapia",
+      "review": "comprobar oferta y derechos"
+    },
+    {
+      "path": "assets/cursos/flores_de_bach.png",
+      "role": "course_cover",
+      "course": "flores_de_bach",
+      "review": "comprobar oferta y derechos"
+    },
+    {
+      "path": "assets/referencias/campus_referencia.png",
+      "role": "reference_only",
+      "review": "no presentar como funcionalidad comprobada"
+    },
+    {
+      "path": "assets/referencias/certificado_referencia.png",
+      "role": "reference_only",
+      "review": "no presentar como funcionalidad comprobada"
+    },
+    {
+      "path": "assets/referencias/manual_referencia.png",
+      "role": "reference_only",
+      "review": "no presentar como funcionalidad comprobada"
+    },
+    {
+      "path": "assets/referencias/tablero_identidad_completo_referencia.png",
+      "role": "reference_only",
+      "review": "no presentar como funcionalidad comprobada"
+    },
+    {
+      "path": "assets/referencias/web_referencia.png",
+      "role": "reference_only",
+      "review": "no presentar como funcionalidad comprobada"
+    },
+    {
+      "path": "assets/file_0000000023b4820e9aee8fa7ca014615.png",
+      "role": "unclassified",
+      "review": "inspeccionar antes de publicar"
+    },
+    {
+      "path": "assets/file_0000000043a4820e858dbdb9e0b9726f.png",
+      "role": "unclassified",
+      "review": "inspeccionar antes de publicar"
+    },
+    {
+      "path": "assets/file_00000000e590820e844eaf654c3b4b00.png",
+      "role": "unclassified",
+      "review": "inspeccionar antes de publicar"
+    },
+    {
+      "path": "assets/file_00000000ff00820eaa8acb6801f40013.png",
+      "role": "unclassified",
+      "review": "inspeccionar antes de publicar"
+    }
+  ],
+  "publishing": {
+    "requires_human_approval": true,
+    "automatic_upload": false
+  },
+  "campaign": {
+    "site": "https://yuna-academy.vercel.app/",
+    "youtube": "https://www.youtube.com/@YunaSoundHolistic"
+  }
+}
