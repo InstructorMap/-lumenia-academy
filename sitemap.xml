@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://instructormap.github.io/-lumenia-academy/</loc></url>
-  <url><loc>https://instructormap.github.io/-lumenia-academy/programas/</loc></url>
-  <url><loc>https://instructormap.github.io/-lumenia-academy/comparte/</loc></url>
-  <url><loc>https://instructormap.github.io/-lumenia-academy/campus/</loc></url>
-  <url><loc>https://instructormap.github.io/-lumenia-academy/verificar/</loc></url>
+  <url><loc>https://yuna-academy.vercel.app/</loc></url>
+  <url><loc>https://yuna-academy.vercel.app/programas/</loc></url>
+  <url><loc>https://yuna-academy.vercel.app/comparte/</loc></url>
+  <url><loc>https://yuna-academy.vercel.app/campus/</loc></url>
+  <url><loc>https://yuna-academy.vercel.app/docentes/</loc></url>
+  <url><loc>https://yuna-academy.vercel.app/privacidad/</loc></url>
+  <url><loc>https://yuna-academy.vercel.app/terminos/</loc></url>
 </urlset>
