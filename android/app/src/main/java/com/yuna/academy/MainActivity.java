@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
     bar.gravity = android.view.Gravity.TOP;
     layout.addView(web);
     layout.addView(progress, bar);
-    setContentView(layout);
+    setContentView(layout);\n    layout.setBackgroundColor(Color.rgb(250,246,238));
     WebSettings settings = web.getSettings();
     settings.setJavaScriptEnabled(true);
     settings.setDomStorageEnabled(true);
