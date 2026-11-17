@@ -72,8 +72,15 @@ def main():
             if transparent:
                 layer=transparent[(n+shot)%len(transparent)]
                 with Image.open(ROOT/layer["path"]) as raw:
-                    decal=raw.convert("RGBA");decal.thumbnail((780,800),Image.Resampling.LANCZOS)
-                fg.alpha_composite(decal,(1080-decal.width-35,120))
+                    decal=raw.convert("RGBA")
+                    # Trim fully transparent margins before sizing the actual subject.
+                    bounds=decal.getchannel("A").point(lambda v:255 if v>18 else 0).getbbox()
+                    if bounds:decal=decal.crop(bounds)
+                    decal.thumbnail((570,540),Image.Resampling.LANCZOS)
+                    # Keep the decorative layer above the copy-safe lower third.
+                    opacity=decal.getchannel("A").point(lambda v:int(v*.76))
+                    decal.putalpha(opacity)
+                fg.alpha_composite(decal,(max(0,1080-decal.width-42),140+shot*95))
                 alpha_id=layer["id"]
             else:
                 draw=ImageDraw.Draw(fg)
@@ -82,10 +89,17 @@ def main():
                     draw.ellipse((x-r,y-r,x+r,y+r),fill=(255,212,161,rng.randrange(75,175)))
             fp=OUT/f"foreground-{n}-{shot}.png";fg.save(fp)
             tp=Image.new("RGBA",(1080,1920),(0,0,0,0))
+            # A soft gradient preserves legibility without a hard horizontal card edge.
+            shade=Image.new("RGBA",(1080,1920),(0,0,0,0))
+            sd=ImageDraw.Draw(shade)
+            for yy in range(1270,1920):
+                opacity=int(150*((yy-1270)/650)**1.3)
+                sd.line((0,yy,1079,yy),fill=(9,13,26,opacity))
+            tp.alpha_composite(shade)
             td=ImageDraw.Draw(tp)
             # No opaque cards. Typography is a separately animated RGBA plane.
-            td.text((80,1400),"YUNA",font=ImageFont.truetype(font,95),fill="#f5e5c5")
-            td.line((80,1515,315,1515),fill="#d8b679",width=4)
+            td.text((80,1420),"YUNA",font=ImageFont.truetype(font,95),fill="#f5e5c5")
+            td.line((80,1535,315,1535),fill="#d8b679",width=4)
             msg=[course[1],"Aprendé a tu ritmo","Explorá YUNA Academy"][shot]
             words=msg.split();lines=[];line=""
             face=ImageFont.truetype(font,52)
@@ -96,8 +110,8 @@ def main():
                 else:line=test
             if line:lines.append(line)
             for j,ln in enumerate(lines):
-                td.text((80,1580+j*70),ln,font=face,fill="white",stroke_width=2,stroke_fill="#101020")
-            td.text((80,1820),"yuna-academy.vercel.app",font=ImageFont.truetype(regular,35),fill="#f5d7a8")
+                td.text((80,1600+j*70),ln,font=face,fill="white",stroke_width=2,stroke_fill="#101020")
+            td.text((80,1840),"yuna-academy.vercel.app",font=ImageFont.truetype(regular,35),fill="#f5d7a8")
             txt=OUT/f"text-{n}-{shot}.png";tp.save(txt)
             clip=OUT/f"clip-{n}-{shot}.mp4"
             vf=("[0:v]scale=1140:2027,zoompan=z='min(zoom+0.00020,1.06)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=24,format=rgba[bg];"
