@@ -1,0 +1,34 @@
+name: YUNA Creative Studio - commercial short pilot
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install Pillow==11.3.0
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - name: Fetch previously approved Sakura music
+        run: |
+          mkdir -p /tmp/yuna
+          curl -fL --retry 3 --max-time 180 'https://ai-music-tracks.s3.us-east-1.amazonaws.com/5195c175-1edf-40e8-8bf9-b7b6bc5192da/5e8dcc19-584f-4020-aebc-83fc20a22643.wav' -o /tmp/yuna/sakura.wav
+          ffprobe -v error /tmp/yuna/sakura.wav
+      - name: Render commercial pilot with original YUNA assets
+        run: bash creative-studio/scripts/render_pilot.sh /tmp/yuna/sakura.wav
+      - name: Validate final file
+        run: |
+          test -s creative-studio/output/yuna-academy-piloto-01.mp4
+          ffprobe -v error -show_entries stream=codec_type -of csv=p=0 creative-studio/output/yuna-academy-piloto-01.mp4 | grep -q video
+          ffprobe -v error -show_entries stream=codec_type -of csv=p=0 creative-studio/output/yuna-academy-piloto-01.mp4 | grep -q audio
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YUNA-Academy-Short-Pilot-01
+          path: creative-studio/output/yuna-academy-piloto-01.mp4
+          retention-days: 7
+          if-no-files-found: error
