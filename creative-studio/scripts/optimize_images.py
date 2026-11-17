@@ -4,7 +4,7 @@ import argparse, json, math
 from pathlib import Path
 from PIL import Image, ImageOps, ImageFilter
 
-ROOT=Path(__file__).resolve().parents[2]
+ROOT=Path(__file__).resolve().parents[1]
 MANIFEST=ROOT/"resources/ia/manifest.json"
 OUT=ROOT/"generated/optimized"
 SIZES={"reel":(1080,1920),"story":(1080,1920),"square":(1080,1080),"landscape":(1920,1080),"thumbnail":(1280,720)}
@@ -69,7 +69,7 @@ def main():
     OUT.mkdir(parents=True,exist_ok=True)
     report=[]
     for asset in data["assets"]:
-        path=ROOT.parents[1]/asset["path"]
+        path=ROOT.parent/asset["path"]
         if not path.exists():
             report.append({"id":asset["id"],"error":"missing source","path":str(path)});continue
         try:
