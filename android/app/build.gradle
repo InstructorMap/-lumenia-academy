@@ -9,5 +9,21 @@ android {
         versionCode 1
         versionName '1.0.0'
     }
+    signingConfigs {
+        release {
+            if (System.getenv('YUNA_KEYSTORE_PATH')) {
+                storeFile file(System.getenv('YUNA_KEYSTORE_PATH'))
+                storePassword System.getenv('YUNA_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('YUNA_KEY_ALIAS')
+                keyPassword System.getenv('YUNA_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (System.getenv('YUNA_KEYSTORE_PATH')) signingConfig signingConfigs.release
+        }
+    }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }
