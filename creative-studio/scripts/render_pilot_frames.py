@@ -3,6 +3,8 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from pathlib import Path
 import math
+import io
+import cairosvg
 R=Path(__file__).resolve().parents[2]
 O=R/"creative-studio/output/frames"; O.mkdir(parents=True,exist_ok=True)
 W,H=1080,1920
@@ -18,6 +20,10 @@ def centered(im,asset,box):
     x,y,w,h=box
     item=cover(asset,w,h)
     im.alpha_composite(item,(x+(w-item.width)//2,y+(h-item.height)//2))
+def svg_layer(path):
+    data=cairosvg.svg2png(url=str(R/path),output_width=W,output_height=H)
+    return Image.open(io.BytesIO(data)).convert("RGBA")
+
 def base(i):
     im=Image.new("RGBA",(W,H))
     px=im.load()
@@ -25,11 +31,17 @@ def base(i):
         t=y/H
         c=tuple(int(a*(1-t)+b*t) for a,b in zip((248,242,230),(224,209,184)))
         ImageDraw.Draw(im).line((0,y,W,y),fill=c+(255,))
+    bg=["sakura-dawn.svg","temple-night.svg","sakura-dawn.svg","temple-night.svg","sakura-dawn.svg"][i]
+    backdrop=svg_layer("creative-studio/resources/backgrounds/"+bg)
+    backdrop.putalpha(90 if i in (1,2,3) else 140)
+    im.alpha_composite(backdrop)
     d=ImageDraw.Draw(im)
     for k in range(5):
         d.ellipse((W//2-(390+k*70),230-k*65,W//2+(390+k*70),950+k*65),outline=(175,146,102,30),width=3)
     d.line((90,1530,990,1530),fill=(158,128,88,110),width=3)
     d.text((90,145),"YUNA  /  ACADEMY",font=font(35,True),fill=(68,66,61))
+    overlay=svg_layer("creative-studio/resources/overlays/"+("sakura-petals.svg" if i%2==0 else "gold-sparkles.svg"))
+    im.alpha_composite(overlay)
     d.text((90,1620),"DESCUBRI YUNA ACADEMY",font=font(38,True),fill=(45,56,72))
     d.text((90,1688),"yuna-academy.vercel.app",font=font(30),fill=(91,83,69))
     return im
@@ -60,7 +72,7 @@ frames=[
 ]
 for i,(lines,assets) in enumerate(frames):
     im=base(i)
-    if i in (0,4): yuna_emblem(im)
+    if i in (0,4): centered(im,"assets/branding/file_00000000bc98820e81cf96aab0d1dfa7.png",(110,290,860,760))
     elif len(assets)==1: centered(im,assets[0],(110,290,860,760))
     else:
         centered(im,assets[0],(85,345,440,650))
