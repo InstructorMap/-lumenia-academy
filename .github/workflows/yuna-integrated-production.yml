@@ -1,0 +1,43 @@
+name: YUNA Creative Studio - integrated weekly production
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 12 * * 2'
+permissions:
+  contents: write
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install free tools
+        run: |
+          python -m pip install Pillow==11.3.0 numpy
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - name: Optimize source images
+        run: python creative-studio/scripts/optimize_images.py --formats reel
+      - name: Compose audio, storyboard and three promotional Shorts
+        run: python creative-studio/scripts/production_pipeline.py
+      - name: Upload review package (no automatic publication)
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNA-Creative-Weekly-Review
+          path: |
+            creative-studio/generated/production/
+            creative-studio/generated/optimized/report.json
+          retention-days: 30
+          if-no-files-found: error
+      - name: Persist non-sensitive production history
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add creative-studio/production-history.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Record YUNA production draft history [skip ci]"
+            git push
+          fi
