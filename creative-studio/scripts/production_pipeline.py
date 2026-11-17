@@ -29,6 +29,7 @@ def main():
     used={z["asset"] for v in previous["productions"][-4:] for z in v.get("scenes",[])}
     backgrounds.sort(key=lambda x:(x["id"] in used,rng.random()))
     scenes=[]
+    crop_audit=[]
     font="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
     regular="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     import statistics
@@ -61,7 +62,9 @@ def main():
         for shot in range(3):
             item=backgrounds[(n*3+shot)%len(backgrounds)]
             with Image.open(ROOT/item["path"]) as raw:
-                im=source_crop(ImageOps.exif_transpose(raw).convert("RGB"))
+                original=ImageOps.exif_transpose(raw).convert("RGB")
+                im=source_crop(original)
+                crop_audit.append({"asset":item["id"],"original":list(original.size),"cropped":list(im.size),"crop_applied":im.size!=original.size})
             im=ImageOps.fit(im,(1080,1920),method=Image.Resampling.LANCZOS,centering=(.5,.45))
             base=OUT/f"background-{n}-{shot}.png";im.save(base,optimize=True)
             fg=Image.new("RGBA",(1080,1920),(0,0,0,0))
@@ -104,6 +107,7 @@ def main():
             run(["ffmpeg","-hide_banner","-loglevel","error","-y","-loop","1","-framerate","24","-i",str(base),
                  "-loop","1","-framerate","24","-i",str(fp),"-loop","1","-framerate","24","-i",str(txt),
                  "-filter_complex",vf,"-map","[out]","-t","8","-r","24","-c:v","libx264","-preset","ultrafast","-crf","26",str(clip)])
+            if not clip.exists() or clip.stat().st_size<100_000:raise SystemExit(f"Missing or empty animated scene: {clip}")
             clips.append(clip)
             scenes.append({"asset":item["id"],"message":msg,"overlay":alpha_id})
         playlist=OUT/f"concat-{n}.txt"
@@ -118,8 +122,11 @@ def main():
         streams=json.loads(subprocess.check_output(["ffprobe","-v","error","-show_streams","-of","json",str(video)]))["streams"]
         kinds={s["codec_type"] for s in streams}
         ok=video.stat().st_size>100_000 and {"video","audio"}<=kinds and any(z.get("width")==1080 and z.get("height")==1920 for z in streams if z["codec_type"]=="video")
-        qa.append({"file":video.name,"passed":ok,"streams":sorted(kinds),"bytes":video.stat().st_size})
+        duration=float(json.loads(subprocess.check_output(["ffprobe","-v","error","-show_format","-of","json",str(video)]))["format"]["duration"])
+        ok=ok and 23.5<=duration<=24.5 and len(clips)==3
+        qa.append({"file":video.name,"passed":ok,"streams":sorted(kinds),"bytes":video.stat().st_size,"duration_seconds":round(duration,2),"animated_scenes":3})
     if not all(x["passed"] for x in qa):raise SystemExit("QA failed")
+    (OUT/"visual-qa.json").write_text(json.dumps({"transparent_overlays_available":len(transparent),"procedural_fallback_used":len(transparent)==0,"crop_audit":crop_audit,"shots_per_short":3,"requires_human_visual_approval":True},ensure_ascii=False,indent=2))
     record={"seed":a.seed,"created_at":datetime.now(timezone.utc).isoformat(),"course":course[0],"scenes":scenes,"qa":qa,"publication_status":"draft_requires_approval"}
     (OUT/"production.json").write_text(json.dumps(record,ensure_ascii=False,indent=2))
     (OUT/"publishing-draft.txt").write_text("YUNA Academy | "+course[0]+"\n"+course[1]+"\nConocé nuestros cursos: https://yuna-academy.vercel.app/\nCanal: https://www.youtube.com/@YunaSoundHolistic\nESTADO: BORRADOR, NO PUBLICADO\n",encoding="utf-8")
