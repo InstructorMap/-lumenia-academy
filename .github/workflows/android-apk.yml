@@ -27,6 +27,33 @@ jobs:
       - name: Build installable APK
         working-directory: android
         run: gradle --no-daemon assembleDebug
+      - name: Prepare release signing
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        env:
+          YUNA_KEYSTORE_BASE64: ${{ secrets.YUNA_KEYSTORE_BASE64 }}
+          YUNA_KEYSTORE_PASSWORD: ${{ secrets.YUNA_KEYSTORE_PASSWORD }}
+          YUNA_KEY_ALIAS: ${{ secrets.YUNA_KEY_ALIAS }}
+          YUNA_KEY_PASSWORD: ${{ secrets.YUNA_KEY_PASSWORD }}
+        run: |
+          test -n "$YUNA_KEYSTORE_BASE64" && test -n "$YUNA_KEYSTORE_PASSWORD" && test -n "$YUNA_KEY_ALIAS" && test -n "$YUNA_KEY_PASSWORD" || { echo "Release signing secrets missing"; exit 1; }
+          printf '%s' "$YUNA_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/yuna-release.jks"
+          echo "YUNA_KEYSTORE_PATH=$RUNNER_TEMP/yuna-release.jks" >> "$GITHUB_ENV"
+      - name: Build signed release APK
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        working-directory: android
+        env:
+          YUNA_KEYSTORE_PASSWORD: ${{ secrets.YUNA_KEYSTORE_PASSWORD }}
+          YUNA_KEY_ALIAS: ${{ secrets.YUNA_KEY_ALIAS }}
+          YUNA_KEY_PASSWORD: ${{ secrets.YUNA_KEY_PASSWORD }}
+        run: gradle --no-daemon assembleRelease
+      - name: Publish signed release APK
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNA-Academy-Release-Signed
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
       - name: Publish downloadable APK
         uses: actions/upload-artifact@v4
         with:
