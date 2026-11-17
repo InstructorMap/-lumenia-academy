@@ -7,7 +7,7 @@ const tracks=[
 const key='yuna-sound-v1',resumeKey='yuna-sound-position';
 let prefs={volume:.28,muted:false,track:0};try{Object.assign(prefs,JSON.parse(localStorage.getItem(key)||'{}'))}catch{}
 prefs.track=Math.max(0,Math.min(tracks.length-1,Number(prefs.track)||0));
-const audio=new Audio();audio.preload='auto';audio.loop=false;audio.volume=Math.max(0,Math.min(1,Number(prefs.volume)||0));audio.muted=!!prefs.muted;audio.src=tracks[prefs.track].url;
+const audio=new Audio();audio.preload='auto';audio.loop=false;audio.volume=Math.max(0,Math.min(1,Number.isFinite(Number(prefs.volume))?Number(prefs.volume):.28));audio.muted=!!prefs.muted;audio.src=tracks[prefs.track].url;
 const css=document.createElement('style');css.textContent=`
 #yuna-sound-player{position:fixed;left:12px;bottom:12px;z-index:9999;width:min(290px,calc(100vw - 24px));box-sizing:border-box;background:#182b3bf2;color:#fff;border:1px solid #d6b87e99;border-radius:999px;padding:8px 12px;box-shadow:0 5px 20px #09162344;font:12px system-ui;backdrop-filter:blur(12px);display:flex;align-items:center;gap:9px}
 #yuna-sound-player .ys-title{font-weight:700;white-space:nowrap;font-size:11px}
@@ -27,16 +27,16 @@ function render(){volume.value=Math.round(audio.volume*100);mute.textContent=aud
 let pending=false;function attempt(){if(pending||!audio.paused)return;pending=true;const p=audio.play();if(p&&p.then)p.then(()=>{status.textContent='Reproduciendo'}).catch(()=>{status.textContent='El navegador requiere una interacción para activar el sonido';}).finally(()=>{pending=false});else pending=false;}
 function select(i){prefs.track=(i+tracks.length)%tracks.length;save();audio.src=tracks[prefs.track].url;render();attempt()}
 audio.addEventListener('ended',()=>select(prefs.track+1));
-audio.addEventListener('error',()=>{status.textContent='Reintentando música ambiental';setTimeout(()=>select(prefs.track+1),2500)});
+let failures=0;audio.addEventListener('playing',()=>{failures=0;});audio.addEventListener('error',()=>{status.textContent='Audio temporalmente no disponible';if(++failures<=tracks.length)setTimeout(()=>select(prefs.track+1),2500);});
 mute.addEventListener('click',()=>{audio.muted=!audio.muted;prefs.muted=audio.muted;save();render();attempt()});
 volume.addEventListener('input',()=>{audio.volume=Number(volume.value)/100;prefs.volume=audio.volume;save();render();attempt()});
 
 try{const old=JSON.parse(sessionStorage.getItem(resumeKey)||'null');if(old&&old.track===prefs.track&&Date.now()-old.at<60000&&old.time>0)audio.addEventListener('loadedmetadata',()=>{audio.currentTime=Math.min(old.time,Math.max(0,audio.duration-1))},{once:true})}catch{}
 function checkpoint(){try{sessionStorage.setItem(resumeKey,JSON.stringify({track:prefs.track,time:audio.currentTime,at:Date.now()}))}catch{}}
-setInterval(checkpoint,2000);window.addEventListener('pagehide',checkpoint);
+setInterval(checkpoint,2000);window.addEventListener('pagehide',checkpoint);document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')checkpoint();});
 let lastUnlock=0;
 function unlock(){if(!audio.paused)return;const now=Date.now();if(now-lastUnlock<1200)return;lastUnlock=now;attempt();}
-['pointerdown','touchstart','touchend','click','keydown','wheel','scroll'].forEach(event=>document.addEventListener(event,unlock,{passive:true,capture:event==='scroll'}));
-window.addEventListener('scroll',unlock,{passive:true});
+['pointerdown','touchstart','touchmove','touchend','click','keydown','wheel','scroll'].forEach(event=>document.addEventListener(event,unlock,{passive:true,capture:event==='scroll'}));
+window.addEventListener('scroll',unlock,{passive:true});window.addEventListener('pageshow',unlock);
 render();attempt();
 })();
