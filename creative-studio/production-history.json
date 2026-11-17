@@ -1,0 +1,56 @@
+{
+  "productions": [
+    {
+      "seed": 202647,
+      "created_at": "2026-11-17T20:08:03.696659+00:00",
+      "course": "Meditación",
+      "scenes": [
+        {
+          "asset": "yuna-ia-04",
+          "path": "creative-studio/generated/production/scene-1.png",
+          "message": "Encontrá tu espacio de calma"
+        },
+        {
+          "asset": "yuna-ia-02",
+          "path": "creative-studio/generated/production/scene-2.png",
+          "message": "Aprendé a tu ritmo"
+        },
+        {
+          "asset": "yuna-ia-07",
+          "path": "creative-studio/generated/production/scene-3.png",
+          "message": "YUNA ACADEMY"
+        }
+      ],
+      "qa": [
+        {
+          "file": "yuna-short-1.mp4",
+          "passed": true,
+          "streams": [
+            "audio",
+            "video"
+          ],
+          "bytes": 481319
+        },
+        {
+          "file": "yuna-short-2.mp4",
+          "passed": true,
+          "streams": [
+            "audio",
+            "video"
+          ],
+          "bytes": 466953
+        },
+        {
+          "file": "yuna-short-3.mp4",
+          "passed": true,
+          "streams": [
+            "audio",
+            "video"
+          ],
+          "bytes": 467204
+        }
+      ],
+      "publication_status": "draft_requires_approval"
+    }
+  ]
+}
