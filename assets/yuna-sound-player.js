@@ -9,18 +9,21 @@ let prefs={volume:.28,muted:false,track:0};try{Object.assign(prefs,JSON.parse(lo
 prefs.track=Math.max(0,Math.min(tracks.length-1,Number(prefs.track)||0));
 const audio=new Audio();audio.preload='auto';audio.loop=false;audio.volume=Math.max(0,Math.min(1,Number(prefs.volume)||0));audio.muted=!!prefs.muted;audio.src=tracks[prefs.track].url;
 const css=document.createElement('style');css.textContent=`
-#yuna-sound-player{position:fixed;left:14px;bottom:14px;z-index:99999;max-width:min(330px,calc(100vw - 28px));background:#182b3beF;color:#fff;border:1px solid #d6b87e;border-radius:18px;padding:12px 14px;box-shadow:0 12px 36px #09162355;font:13px system-ui;backdrop-filter:blur(15px)}
-#yuna-sound-player .ys-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}#yuna-sound-player .ys-head strong{flex:1;font-size:12px}
-#yuna-sound-player button{background:#e6c98c;color:#1e2934;border:0;border-radius:9px;padding:7px 9px;cursor:pointer;font-weight:700}#yuna-sound-player button:focus-visible,#yuna-sound-player input:focus-visible{outline:3px solid white}
-#yuna-sound-player .ys-controls{display:flex;align-items:center;gap:9px}#yuna-sound-player input{width:95px;accent-color:#e6c98c}#yuna-sound-player .ys-track{font-size:11px;opacity:.85;margin-top:7px}
-#yuna-sound-player .ys-status{font-size:11px;color:#f5dfae;margin-top:5px}
-@media(max-width:600px){#yuna-sound-player{left:8px;bottom:64px;padding:9px 11px}#yuna-sound-player input{width:75px}}`;document.head.append(css);
+#yuna-sound-player{position:fixed;left:12px;bottom:12px;z-index:9999;width:min(290px,calc(100vw - 24px));box-sizing:border-box;background:#182b3bf2;color:#fff;border:1px solid #d6b87e99;border-radius:999px;padding:8px 12px;box-shadow:0 5px 20px #09162344;font:12px system-ui;backdrop-filter:blur(12px);display:flex;align-items:center;gap:9px}
+#yuna-sound-player .ys-title{font-weight:700;white-space:nowrap;font-size:11px}
+#yuna-sound-player .ys-controls{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+#yuna-sound-player button{background:#e6c98c;color:#1e2934;border:0;border-radius:50%;width:34px;height:34px;flex:0 0 34px;cursor:pointer;font-size:16px;line-height:1}
+#yuna-sound-player button:focus-visible,#yuna-sound-player input:focus-visible{outline:2px solid white;outline-offset:2px}
+#yuna-sound-player input{width:100%;min-width:45px;accent-color:#e6c98c;margin:0}
+#yuna-sound-player .ys-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(max-width:600px){#yuna-sound-player{left:8px;bottom:9px;width:174px;max-width:calc(100vw - 165px);min-width:140px;padding:5px 8px;gap:6px;box-shadow:0 3px 12px #09162333}#yuna-sound-player .ys-title{display:none}#yuna-sound-player button{width:32px;height:32px;flex-basis:32px}#yuna-sound-player .ys-controls{gap:7px}}
+`;document.head.append(css);
 const wrap=document.createElement('aside');wrap.id='yuna-sound-player';wrap.setAttribute('aria-label','Música ambiental Yuna Sound Holistic');
-wrap.innerHTML='<div class="ys-head"><span aria-hidden="true">♫</span><strong>YUNA Sound Holistic</strong></div><div class="ys-controls"><button type="button" id="ys-mute" aria-label="Silenciar música">Silenciar</button><label for="ys-volume">Vol.</label><input id="ys-volume" type="range" min="0" max="100" step="1" aria-label="Volumen de música" /></div><div class="ys-track" id="ys-track"></div><div class="ys-status" id="ys-status" aria-live="polite"></div>';
+wrap.innerHTML='<span class="ys-title">♫ YUNA Sound</span><div class="ys-controls"><button type="button" id="ys-mute" aria-label="Silenciar música" title="Silenciar o activar sonido">♫</button><input id="ys-volume" type="range" min="0" max="100" step="1" aria-label="Volumen de música" /></div><span class="ys-status" id="ys-status" aria-live="polite"></span>';
 document.body.append(wrap);
 const $=id=>document.getElementById(id),status=$('ys-status'),volume=$('ys-volume'),mute=$('ys-mute');
 function save(){try{localStorage.setItem(key,JSON.stringify(prefs))}catch{}}
-function render(){volume.value=Math.round(audio.volume*100);mute.textContent=audio.muted?'Activar sonido':'Silenciar';mute.setAttribute('aria-label',audio.muted?'Activar sonido':'Silenciar música');$('ys-track').textContent='♫ '+tracks[prefs.track].title+' · reproducción continua'}
+function render(){volume.value=Math.round(audio.volume*100);mute.textContent=audio.muted?'♩':'♫';mute.setAttribute('aria-label',audio.muted?'Activar sonido':'Silenciar música');wrap.title='YUNA Sound Holistic · '+tracks[prefs.track].title}
 function attempt(){const p=audio.play();if(p&&p.then)p.then(()=>{status.textContent='Reproduciendo'}).catch(()=>{status.textContent='Tocá la pantalla para activar la música';});}
 function select(i){prefs.track=(i+tracks.length)%tracks.length;save();audio.src=tracks[prefs.track].url;render();attempt()}
 audio.addEventListener('ended',()=>select(prefs.track+1));
