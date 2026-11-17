@@ -111,7 +111,7 @@ def main():
             clips.append(clip)
             scenes.append({"asset":item["id"],"message":msg,"overlay":alpha_id})
         playlist=OUT/f"concat-{n}.txt"
-        playlist.write_text("".join("file '"+c.name+"'\\n" for c in clips))
+        playlist.write_text("".join("file '"+c.name+"'\n" for c in clips))
         video=OUT/f"yuna-short-{n+1}.mp4"
         run(["ffmpeg","-hide_banner","-loglevel","error","-y","-f","concat","-safe","0","-i",str(playlist),
              "-i",str(audio),"-map","0:v","-map","1:a","-t","24","-c:v","copy","-c:a","aac","-b:a","160k","-movflags","+faststart",str(video)])
