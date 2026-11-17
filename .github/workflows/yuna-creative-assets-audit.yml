@@ -1,0 +1,22 @@
+name: YUNA Creative Studio - audit visual assets
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'creative-studio/**'
+      - 'assets/branding/**'
+      - 'assets/cursos/**'
+      - 'assets/referencias/**'
+      - '.github/workflows/yuna-creative-assets-audit.yml'
+permissions:
+  contents: read
+jobs:
+  asset-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate visual asset catalog
+        run: python creative-studio/scripts/audit_assets.py
