@@ -1,0 +1,26 @@
+name: YUNA Sound - render weekly
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify inputs
+        run: |
+          test -s automation/yuna-sound/input/track.wav || { echo "Missing original track.wav"; exit 1; }
+          test -s automation/yuna-sound/input/visual.jpg || { echo "Missing licensed visual.jpg"; exit 1; }
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Render videos
+        run: bash automation/yuna-sound/scripts/render.sh
+      - name: Upload draft videos
+        uses: actions/upload-artifact@v4
+        with:
+          name: YUNA-Sound-Weekly-Drafts
+          path: automation/yuna-sound/output/
+          retention-days: 7
+          if-no-files-found: error
