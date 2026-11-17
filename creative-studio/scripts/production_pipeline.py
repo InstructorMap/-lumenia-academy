@@ -31,51 +31,86 @@ def main():
     scenes=[]
     font="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
     regular="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
-    def fit_text(draw, message, max_width, initial=65):
-        size=initial
-        while size>24:
-            face=ImageFont.truetype(font,size)
-            if draw.textbbox((0,0),message,font=face)[2]<=max_width:return face
-            size-=2
-        return ImageFont.truetype(font,24)
-    # Never reuse legacy brand artwork: render a clean YUNA wordmark until official logo is verified.
-    for i,item in enumerate(backgrounds[:3]):
-        src=ROOT/item["path"]
-        with Image.open(src) as image:
-            original=ImageOps.exif_transpose(image).convert("RGB")
-            # Full-bleed 9:16 foreground; no blurred letterboxing or horizontal bands.
-            im=ImageOps.fit(original,(1080,1920),method=Image.Resampling.LANCZOS,centering=(.5,.42))
-        # Dark transparent gradient protects typography without opaque rectangular cards.
-        veil=Image.new("RGBA",im.size,(0,0,0,0))
-        alpha=Image.new("L",(1,1920))
-        for y in range(1920):
-            opacity=int(185*max(0,(y-1100)/820)**1.5)
-            alpha.putpixel((0,y),min(200,opacity))
-        veil.putalpha(alpha.resize(im.size))
-        im=Image.alpha_composite(im.convert("RGBA"),veil)
-        d=ImageDraw.Draw(im)
-        msg=[course[1],"Aprendé a tu ritmo","Explorá YUNA Academy"][i]
-        d.text((82,1370),"YUNA",font=ImageFont.truetype(font,94),fill="#f5e7cd",stroke_width=1,stroke_fill="#594126")
-        d.line((84,1488,315,1488),fill="#dfbd83",width=5)
-        face=fit_text(d,msg,900,60)
-        # Multiline wrap for longer course headlines.
-        words=msg.split();lines=[];line=""
-        for word in words:
-            candidate=(line+" "+word).strip()
-            if d.textbbox((0,0),candidate,font=face)[2]>900 and line:
-                lines.append(line);line=word
-            else:line=candidate
-        if line:lines.append(line)
-        for j,line in enumerate(lines):
-            d.text((82,1550+j*86),line,font=face,fill="white",stroke_width=1,stroke_fill="#18202b")
-        d.text((84,1810),"yuna-academy.vercel.app",font=ImageFont.truetype(regular,35),fill="#f1d8ae")
-        dest=OUT/f"scene-{i+1}.png";im.convert("RGB").save(dest,optimize=True)
-        scenes.append({"asset":item["id"],"path":str(dest.relative_to(ROOT)),"message":msg})
-    # Full-bleed 1080x1920 at 24 fps; three editorial beats with restrained camera motion.
+    import statistics
+    def source_crop(im):
+        # Identify embedded blurred top/bottom padding by low horizontal detail.
+        w,h=im.size
+        sample=im.resize((128,256))
+        scores=[]
+        for y in range(256):
+            pixels=[sample.getpixel((x,y)) for x in range(0,128,8)]
+            scores.append(sum(statistics.pstdev([p[c] for p in pixels]) for c in range(3)))
+        mid=statistics.median(scores[88:168])
+        active=[i for i,v in enumerate(scores) if v>max(18,mid*.33)]
+        if len(active)>65:
+            top=max(0,min(active)-2);bottom=min(256,max(active)+3)
+            if 65<bottom-top<210:
+                return im.crop((0,round(top*h/256),w,round(bottom*h/256)))
+        return im
+    transparent=[]
+    for item in data["assets"]:
+        if item["category"]!="overlay_candidate" or not (ROOT/item["path"]).exists():continue
+        with Image.open(ROOT/item["path"]) as candidate:
+            if "A" in candidate.getbands() and candidate.getchannel("A").getextrema()[0]<245:
+                transparent.append(item)
+    print("Verified transparent layers:",len(transparent))
+    # Three different 8-second shots per Short. Each shot contains a moving
+    # background, an independently moving alpha layer and fading typography.
     for n in range(3):
-        image=OUT/f"scene-{n+1}.png";video=OUT/f"yuna-short-{n+1}.mp4"
-        vf="scale=1140:2027,zoompan=z='min(zoom+0.00018,1.055)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=24,format=yuv420p"
-        run(["ffmpeg","-hide_banner","-loglevel","error","-y","-loop","1","-framerate","24","-i",str(image),"-i",str(audio),"-t","24","-vf",vf,"-c:v","libx264","-preset","veryfast","-crf","25","-c:a","aac","-b:a","160k","-shortest","-movflags","+faststart",str(video)])
+        clips=[]
+        for shot in range(3):
+            item=backgrounds[(n*3+shot)%len(backgrounds)]
+            with Image.open(ROOT/item["path"]) as raw:
+                im=source_crop(ImageOps.exif_transpose(raw).convert("RGB"))
+            im=ImageOps.fit(im,(1080,1920),method=Image.Resampling.LANCZOS,centering=(.5,.45))
+            base=OUT/f"background-{n}-{shot}.png";im.save(base,optimize=True)
+            fg=Image.new("RGBA",(1080,1920),(0,0,0,0))
+            alpha_id="procedural"
+            if transparent:
+                layer=transparent[(n+shot)%len(transparent)]
+                with Image.open(ROOT/layer["path"]) as raw:
+                    decal=raw.convert("RGBA");decal.thumbnail((780,800),Image.Resampling.LANCZOS)
+                fg.alpha_composite(decal,(1080-decal.width-35,120))
+                alpha_id=layer["id"]
+            else:
+                draw=ImageDraw.Draw(fg)
+                for k in range(35):
+                    x=rng.randrange(50,1030);y=rng.randrange(120,1450);r=rng.randrange(2,8)
+                    draw.ellipse((x-r,y-r,x+r,y+r),fill=(255,212,161,rng.randrange(75,175)))
+            fp=OUT/f"foreground-{n}-{shot}.png";fg.save(fp)
+            tp=Image.new("RGBA",(1080,1920),(0,0,0,0))
+            td=ImageDraw.Draw(tp)
+            # No opaque cards. Typography is a separately animated RGBA plane.
+            td.text((80,1400),"YUNA",font=ImageFont.truetype(font,95),fill="#f5e5c5")
+            td.line((80,1515,315,1515),fill="#d8b679",width=4)
+            msg=[course[1],"Aprendé a tu ritmo","Explorá YUNA Academy"][shot]
+            words=msg.split();lines=[];line=""
+            face=ImageFont.truetype(font,52)
+            for word in words:
+                test=(line+" "+word).strip()
+                if td.textbbox((0,0),test,font=face)[2]>900 and line:
+                    lines.append(line);line=word
+                else:line=test
+            if line:lines.append(line)
+            for j,ln in enumerate(lines):
+                td.text((80,1580+j*70),ln,font=face,fill="white",stroke_width=2,stroke_fill="#101020")
+            td.text((80,1820),"yuna-academy.vercel.app",font=ImageFont.truetype(regular,35),fill="#f5d7a8")
+            txt=OUT/f"text-{n}-{shot}.png";tp.save(txt)
+            clip=OUT/f"clip-{n}-{shot}.mp4"
+            vf=("[0:v]scale=1140:2027,zoompan=z='min(zoom+0.00020,1.06)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=1080x1920:fps=24,format=rgba[bg];"
+                "[1:v]format=rgba[decal];[bg][decal]overlay=x='12+18*sin(t*0.7)':y='12+10*cos(t*0.6)':eval=frame:shortest=1[mid];"
+                "[2:v]format=rgba,fade=t=in:st=0.6:d=1:alpha=1[words];"
+                "[mid][words]overlay=0:0:shortest=1,format=yuv420p[out]")
+            run(["ffmpeg","-hide_banner","-loglevel","error","-y","-loop","1","-framerate","24","-i",str(base),
+                 "-loop","1","-framerate","24","-i",str(fp),"-loop","1","-framerate","24","-i",str(txt),
+                 "-filter_complex",vf,"-map","[out]","-t","8","-r","24","-c:v","libx264","-preset","ultrafast","-crf","26",str(clip)])
+            clips.append(clip)
+            scenes.append({"asset":item["id"],"message":msg,"overlay":alpha_id})
+        playlist=OUT/f"concat-{n}.txt"
+        playlist.write_text("".join("file '"+c.name+"'\\n" for c in clips))
+        video=OUT/f"yuna-short-{n+1}.mp4"
+        run(["ffmpeg","-hide_banner","-loglevel","error","-y","-f","concat","-safe","0","-i",str(playlist),
+             "-i",str(audio),"-map","0:v","-map","1:a","-t","24","-c:v","copy","-c:a","aac","-b:a","160k","-movflags","+faststart",str(video)])
     # Verify media streams and prohibit accidental publishing.
     qa=[]
     for n in range(3):
