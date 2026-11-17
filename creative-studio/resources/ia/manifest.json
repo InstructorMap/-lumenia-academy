@@ -1,0 +1,428 @@
+{
+  "schema_version": "1.0",
+  "project": "YUNA Creative Studio",
+  "asset_root": "creative-studio/resources/ia",
+  "notes": "Overlay candidates have not been confirmed to contain genuine transparency. Do not assume alpha until validated.",
+  "assets": [
+    {
+      "id": "yuna-ia-01",
+      "file": "01_sakura_fuji.png",
+      "path": "creative-studio/resources/ia/fondos/01_sakura_fuji.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-02",
+      "file": "02_pagoda_luna.png",
+      "path": "creative-studio/resources/ia/fondos/02_pagoda_luna.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-03",
+      "file": "03_bosque_bambu.png",
+      "path": "creative-studio/resources/ia/fondos/03_bosque_bambu.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-04",
+      "file": "04_torii_atardecer.png",
+      "path": "creative-studio/resources/ia/fondos/04_torii_atardecer.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-05",
+      "file": "05_puente_sakura.png",
+      "path": "creative-studio/resources/ia/fondos/05_puente_sakura.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-06",
+      "file": "06_ventana_zen.png",
+      "path": "creative-studio/resources/ia/fondos/06_ventana_zen.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-07",
+      "file": "07_jardin_zen.png",
+      "path": "creative-studio/resources/ia/fondos/07_jardin_zen.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-08",
+      "file": "08_cascada_sakura.png",
+      "path": "creative-studio/resources/ia/fondos/08_cascada_sakura.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-09",
+      "file": "09_meditacion_lago.png",
+      "path": "creative-studio/resources/ia/fondos/09_meditacion_lago.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-10",
+      "file": "10_campo_lavanda.png",
+      "path": "creative-studio/resources/ia/fondos/10_campo_lavanda.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-11",
+      "file": "11_spa_orquideas.png",
+      "path": "creative-studio/resources/ia/fondos/11_spa_orquideas.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-12",
+      "file": "12_aromaterapia.png",
+      "path": "creative-studio/resources/ia/fondos/12_aromaterapia.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-13",
+      "file": "13_tarot_cristal.png",
+      "path": "creative-studio/resources/ia/fondos/13_tarot_cristal.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-14",
+      "file": "14_chakras.png",
+      "path": "creative-studio/resources/ia/fondos/14_chakras.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-15",
+      "file": "15_reiki_manos.png",
+      "path": "creative-studio/resources/ia/fondos/15_reiki_manos.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-16",
+      "file": "16_flores_bach.png",
+      "path": "creative-studio/resources/ia/fondos/16_flores_bach.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-17",
+      "file": "17_cuenco_tibetano.png",
+      "path": "creative-studio/resources/ia/fondos/17_cuenco_tibetano.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-18",
+      "file": "18_flor_loto.png",
+      "path": "creative-studio/resources/ia/fondos/18_flor_loto.png",
+      "category": "background",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "scene_background"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-19",
+      "file": "19_rama_sakura.png",
+      "path": "creative-studio/resources/ia/transparentes/19_rama_sakura.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-20",
+      "file": "20_polvo_dorado.png",
+      "path": "creative-studio/resources/ia/transparentes/20_polvo_dorado.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-21",
+      "file": "21_petalos_sakura.png",
+      "path": "creative-studio/resources/ia/transparentes/21_petalos_sakura.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-22",
+      "file": "22_loto_rosa.png",
+      "path": "creative-studio/resources/ia/transparentes/22_loto_rosa.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-23",
+      "file": "23_yin_yang.png",
+      "path": "creative-studio/resources/ia/transparentes/23_yin_yang.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-24",
+      "file": "24_piedras_zen.png",
+      "path": "creative-studio/resources/ia/transparentes/24_piedras_zen.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-25",
+      "file": "25_farol_japones.png",
+      "path": "creative-studio/resources/ia/transparentes/25_farol_japones.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-26",
+      "file": "26_cristales_amatista.png",
+      "path": "creative-studio/resources/ia/transparentes/26_cristales_amatista.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-27",
+      "file": "27_cartas_tarot.png",
+      "path": "creative-studio/resources/ia/transparentes/27_cartas_tarot.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-28",
+      "file": "28_manos_reiki.png",
+      "path": "creative-studio/resources/ia/transparentes/28_manos_reiki.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-29",
+      "file": "29_ramo_lavanda.png",
+      "path": "creative-studio/resources/ia/transparentes/29_ramo_lavanda.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    },
+    {
+      "id": "yuna-ia-30",
+      "file": "30_loto_hojas.png",
+      "path": "creative-studio/resources/ia/transparentes/30_loto_hojas.png",
+      "category": "overlay_candidate",
+      "format": "png",
+      "intended_use": [
+        "reels",
+        "shorts",
+        "compositing"
+      ],
+      "alpha_verified": false,
+      "quality_status": "pending_visual_review"
+    }
+  ]
+}
