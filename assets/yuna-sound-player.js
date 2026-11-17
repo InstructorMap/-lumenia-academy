@@ -24,7 +24,7 @@ document.body.append(wrap);
 const $=id=>document.getElementById(id),status=$('ys-status'),volume=$('ys-volume'),mute=$('ys-mute');
 function save(){try{localStorage.setItem(key,JSON.stringify(prefs))}catch{}}
 function render(){volume.value=Math.round(audio.volume*100);mute.textContent=audio.muted?'♩':'♫';mute.setAttribute('aria-label',audio.muted?'Activar sonido':'Silenciar música');wrap.title='YUNA Sound Holistic · '+tracks[prefs.track].title}
-function attempt(){const p=audio.play();if(p&&p.then)p.then(()=>{status.textContent='Reproduciendo'}).catch(()=>{status.textContent='Tocá la pantalla para activar la música';});}
+let pending=false;function attempt(){if(pending||!audio.paused)return;pending=true;const p=audio.play();if(p&&p.then)p.then(()=>{status.textContent='Reproduciendo'}).catch(()=>{status.textContent='El navegador requiere una interacción para activar el sonido';}).finally(()=>{pending=false});else pending=false;}
 function select(i){prefs.track=(i+tracks.length)%tracks.length;save();audio.src=tracks[prefs.track].url;render();attempt()}
 audio.addEventListener('ended',()=>select(prefs.track+1));
 audio.addEventListener('error',()=>{status.textContent='Reintentando música ambiental';setTimeout(()=>select(prefs.track+1),2500)});
@@ -34,7 +34,9 @@ volume.addEventListener('input',()=>{audio.volume=Number(volume.value)/100;prefs
 try{const old=JSON.parse(sessionStorage.getItem(resumeKey)||'null');if(old&&old.track===prefs.track&&Date.now()-old.at<60000&&old.time>0)audio.addEventListener('loadedmetadata',()=>{audio.currentTime=Math.min(old.time,Math.max(0,audio.duration-1))},{once:true})}catch{}
 function checkpoint(){try{sessionStorage.setItem(resumeKey,JSON.stringify({track:prefs.track,time:audio.currentTime,at:Date.now()}))}catch{}}
 setInterval(checkpoint,2000);window.addEventListener('pagehide',checkpoint);
-function unlock(){if(audio.paused)attempt();}
-document.addEventListener('pointerdown',unlock,{passive:true});document.addEventListener('keydown',unlock);
+let lastUnlock=0;
+function unlock(){if(!audio.paused)return;const now=Date.now();if(now-lastUnlock<1200)return;lastUnlock=now;attempt();}
+['pointerdown','touchstart','touchend','click','keydown','wheel','scroll'].forEach(event=>document.addEventListener(event,unlock,{passive:true,capture:event==='scroll'}));
+window.addEventListener('scroll',unlock,{passive:true});
 render();attempt();
 })();
