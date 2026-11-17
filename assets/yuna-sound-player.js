@@ -16,7 +16,7 @@ const css=document.createElement('style');css.textContent=`
 #yuna-sound-player .ys-status{font-size:11px;color:#f5dfae;margin-top:5px}
 @media(max-width:600px){#yuna-sound-player{left:8px;bottom:64px;padding:9px 11px}#yuna-sound-player input{width:75px}}`;document.head.append(css);
 const wrap=document.createElement('aside');wrap.id='yuna-sound-player';wrap.setAttribute('aria-label','Música ambiental Yuna Sound Holistic');
-wrap.innerHTML='<div class="ys-head"><span aria-hidden="true">♫</span><strong>YUNA Sound Holistic</strong><button type="button" id="ys-next" title="Siguiente canción">↻</button></div><div class="ys-controls"><button type="button" id="ys-mute" aria-label="Silenciar música">Silenciar</button><label for="ys-volume">Vol.</label><input id="ys-volume" type="range" min="0" max="100" step="1" aria-label="Volumen de música" /></div><div class="ys-track" id="ys-track"></div><div class="ys-status" id="ys-status" aria-live="polite"></div>';
+wrap.innerHTML='<div class="ys-head"><span aria-hidden="true">♫</span><strong>YUNA Sound Holistic</strong></div><div class="ys-controls"><button type="button" id="ys-mute" aria-label="Silenciar música">Silenciar</button><label for="ys-volume">Vol.</label><input id="ys-volume" type="range" min="0" max="100" step="1" aria-label="Volumen de música" /></div><div class="ys-track" id="ys-track"></div><div class="ys-status" id="ys-status" aria-live="polite"></div>';
 document.body.append(wrap);
 const $=id=>document.getElementById(id),status=$('ys-status'),volume=$('ys-volume'),mute=$('ys-mute');
 function save(){try{localStorage.setItem(key,JSON.stringify(prefs))}catch{}}
@@ -24,14 +24,14 @@ function render(){volume.value=Math.round(audio.volume*100);mute.textContent=aud
 function attempt(){const p=audio.play();if(p&&p.then)p.then(()=>{status.textContent='Reproduciendo'}).catch(()=>{status.textContent='Tocá la pantalla para activar la música';});}
 function select(i){prefs.track=(i+tracks.length)%tracks.length;save();audio.src=tracks[prefs.track].url;render();attempt()}
 audio.addEventListener('ended',()=>select(prefs.track+1));
-audio.addEventListener('error',()=>{status.textContent='Audio no disponible; probá la siguiente canción'});
+audio.addEventListener('error',()=>{status.textContent='Reintentando música ambiental';setTimeout(()=>select(prefs.track+1),2500)});
 mute.addEventListener('click',()=>{audio.muted=!audio.muted;prefs.muted=audio.muted;save();render();attempt()});
 volume.addEventListener('input',()=>{audio.volume=Number(volume.value)/100;prefs.volume=audio.volume;save();render();attempt()});
-$('ys-next').addEventListener('click',()=>select(prefs.track+1));
+
 try{const old=JSON.parse(sessionStorage.getItem(resumeKey)||'null');if(old&&old.track===prefs.track&&Date.now()-old.at<60000&&old.time>0)audio.addEventListener('loadedmetadata',()=>{audio.currentTime=Math.min(old.time,Math.max(0,audio.duration-1))},{once:true})}catch{}
 function checkpoint(){try{sessionStorage.setItem(resumeKey,JSON.stringify({track:prefs.track,time:audio.currentTime,at:Date.now()}))}catch{}}
 setInterval(checkpoint,2000);window.addEventListener('pagehide',checkpoint);
-function unlock(){if(audio.paused)attempt();if(!audio.paused){document.removeEventListener('pointerdown',unlock);document.removeEventListener('keydown',unlock)}}
+function unlock(){if(audio.paused)attempt();}
 document.addEventListener('pointerdown',unlock,{passive:true});document.addEventListener('keydown',unlock);
 render();attempt();
 })();
