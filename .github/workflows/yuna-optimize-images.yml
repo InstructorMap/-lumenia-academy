@@ -1,0 +1,46 @@
+name: YUNA Creative Studio - optimize images
+on:
+  workflow_dispatch:
+    inputs:
+      formats:
+        description: 'Output formats: reel,square,landscape,story,thumbnail'
+        required: true
+        default: 'reel,square,landscape'
+        type: string
+      remove_solid_background:
+        description: 'Try removing uniform solid backgrounds (not checkerboards)'
+        required: true
+        default: false
+        type: boolean
+  push:
+    paths:
+      - 'creative-studio/resources/ia/**'
+      - 'creative-studio/scripts/optimize_images.py'
+      - '.github/workflows/yuna-optimize-images.yml'
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install Pillow==11.3.0
+      - name: Optimize images
+        env:
+          FORMATS: ${{ inputs.formats || 'reel,square,landscape' }}
+          REMOVE_BG: ${{ inputs.remove_solid_background || 'false' }}
+        run: |
+          if [ "$REMOVE_BG" = "true" ]; then
+            python creative-studio/scripts/optimize_images.py --formats "$FORMATS" --remove-solid-background
+          else
+            python creative-studio/scripts/optimize_images.py --formats "$FORMATS"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: YUNA-Optimized-Images
+          path: creative-studio/generated/optimized/
+          retention-days: 14
