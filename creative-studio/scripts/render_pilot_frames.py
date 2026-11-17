@@ -60,7 +60,8 @@ frames=[
 ]
 for i,(lines,assets) in enumerate(frames):
     im=base(i)
-    if i in (0,4): yuna_emblem(im)\n    elif len(assets)==1: centered(im,assets[0],(110,290,860,760))
+    if i in (0,4): yuna_emblem(im)
+    elif len(assets)==1: centered(im,assets[0],(110,290,860,760))
     else:
         centered(im,assets[0],(85,345,440,650))
         centered(im,assets[1],(555,345,440,650))
