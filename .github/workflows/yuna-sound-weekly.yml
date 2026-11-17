@@ -1,23 +1,36 @@
-name: YUNA Sound - render weekly
+name: YUNA Sound - weekly draft
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * 1'
 permissions:
   contents: read
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
-      - name: Verify inputs
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install free generation and video dependencies
         run: |
-          test -s automation/yuna-sound/input/track.wav || { echo "Missing original track.wav"; exit 1; }
-          test -s automation/yuna-sound/input/visual.jpg || { echo "Missing licensed visual.jpg"; exit 1; }
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      - name: Render videos
+          python -m pip install numpy pillow
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      - name: Compose original ambient sketch and artwork
+        run: python automation/yuna-sound/scripts/generate.py
+      - name: Render full video and three Shorts
         run: bash automation/yuna-sound/scripts/render.sh
-      - name: Upload draft videos
+      - name: Verify video files
+        run: |
+          for f in automation/yuna-sound/output/*.mp4; do
+            test -s "$f"
+            ffprobe -v error -show_entries stream=codec_type -of csv=p=0 "$f" | grep -q video
+            ffprobe -v error -show_entries stream=codec_type -of csv=p=0 "$f" | grep -q audio
+          done
+      - name: Upload drafts for artistic review
         uses: actions/upload-artifact@v4
         with:
           name: YUNA-Sound-Weekly-Drafts
