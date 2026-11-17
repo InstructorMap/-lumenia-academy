@@ -1,0 +1,38 @@
+name: YUNA Sound - Sakura promotional pilot
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  promotional-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Retrieve previously approved Sakura assets
+        env:
+          MUSIC_URL: https://ai-music-tracks.s3.us-east-1.amazonaws.com/5195c175-1edf-40e8-8bf9-b7b6bc5192da/5e8dcc19-584f-4020-aebc-83fc20a22643.wav
+          CLIP_URL: https://videogen.vidiq.com/5195c175-1edf-40e8-8bf9-b7b6bc5192da/4b3922be-7ec4-46e6-bf16-84ac6da4f9a3_minimax-464097668989308_b58db8e3-ed11-4294-af97-83b50ae33cae.mp4
+        run: |
+          mkdir -p /tmp/yuna
+          curl -fL --retry 3 --connect-timeout 20 --max-time 180 "$MUSIC_URL" -o /tmp/yuna/music.wav
+          curl -fL --retry 3 --connect-timeout 20 --max-time 180 "$CLIP_URL" -o /tmp/yuna/scene.mp4
+          ffprobe -v error /tmp/yuna/music.wav
+          ffprobe -v error /tmp/yuna/scene.mp4
+      - name: Render Sakura promotional package
+        run: bash automation/yuna-sound/scripts/sakura-pilot.sh /tmp/yuna/music.wav /tmp/yuna/scene.mp4
+      - name: Check output streams
+        run: |
+          for f in automation/yuna-sound/output/sakura-*.mp4; do
+            test -s "$f"
+            ffprobe -v error -show_entries stream=codec_type -of csv=p=0 "$f" | grep -q video
+            ffprobe -v error -show_entries stream=codec_type -of csv=p=0 "$f" | grep -q audio
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Sakura-YUNA-Promotional-Pilot
+          path: automation/yuna-sound/output/sakura-*
+          retention-days: 7
+          if-no-files-found: error
