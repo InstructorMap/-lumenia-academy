@@ -209,7 +209,13 @@ class SVGEngine:
 
     def _load_presets(self) -> Dict:
         if PRESETS_PATH.exists():
-            return json.loads(PRESETS_PATH.read_text(encoding="utf-8"))
+            data = json.loads(PRESETS_PATH.read_text(encoding="utf-8"))
+            # V4 config wraps presets in a top-level "presets" object.
+            # Older configurations store the preset mapping directly.
+            presets = data.get("presets", data)
+            if not isinstance(presets, dict):
+                raise ValueError("SVG presets configuration must be a mapping")
+            return presets
         return self._default_presets()
 
     def _default_presets(self) -> Dict:
