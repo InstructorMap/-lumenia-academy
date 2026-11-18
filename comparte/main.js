@@ -27,3 +27,14 @@ $("copy").onclick=async()=>{try{await navigator.clipboard.writeText(currentLink(
 $("whatsapp").onclick=()=>{const msg="✦ Te recomiendo "+selected().name+" en YUNA Academy. Conocé el curso aquí: "+currentLink();location.href="https://api.whatsapp.com/send?text="+encodeURIComponent(msg)};
 $("native").onclick=shareNative;$("download-card").onclick=downloadCard;
 if(user)startedAt=Date.now();setInterval(()=>{if(!startedAt||!user)return;const minutes=Math.floor((Date.now()-startedAt)/60000);$("elapsed").textContent="Tiempo desde que abriste esta sesión: "+minutes+" min. Este contador no indica vencimiento de la promoción."},30000);
+
+/* YUNA Control · analítica agregada sin datos personales */
+const analyticsParams=new URLSearchParams(location.search);
+let visitorToken;
+try{visitorToken=sessionStorage.getItem("yuna_visitor_token");if(!visitorToken){visitorToken=crypto.randomUUID();sessionStorage.setItem("yuna_visitor_token",visitorToken)}}catch{visitorToken=crypto.randomUUID()}
+async function trackYuna(event){try{await db.rpc("yuna_track_event",{p_event:event,p_page:location.pathname,p_visitor:visitorToken,p_course:selected()?.id||null,p_campaign:analyticsParams.get("utm_campaign"),p_source:analyticsParams.get("utm_source"),p_medium:analyticsParams.get("utm_medium")})}catch{}}
+trackYuna("page_view");
+$("whatsapp").addEventListener("click",()=>{trackYuna("share_click")});
+$("native").addEventListener("click",()=>{trackYuna("share_click")});
+$("copy").addEventListener("click",()=>{trackYuna("share_click")});
+$("pay").addEventListener("click",()=>{trackYuna("checkout_click")});
