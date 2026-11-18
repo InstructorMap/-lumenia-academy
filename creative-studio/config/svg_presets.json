@@ -1,0 +1,220 @@
+{
+  "version": "4.0",
+  "description": "Cinematic SVG composition presets for YUNA Creative Studio V4",
+  "presets": {
+    "sakura_fall": {
+      "description": "Natural sakura petals with depth and soft fall",
+      "layers": [
+        {
+          "name": "petal-field.svg",
+          "opacity": 0.42,
+          "scale": 1.08,
+          "depth": "far",
+          "blur": 1.4,
+          "offset_y": -40
+        },
+        {
+          "name": "sakura-petals.svg",
+          "opacity": 0.68,
+          "scale": 1,
+          "depth": "mid",
+          "blur": 0
+        },
+        {
+          "name": "petal-ribbon.svg",
+          "opacity": 0.52,
+          "scale": 0.92,
+          "depth": "near",
+          "blur": 0,
+          "offset_x": 30
+        }
+      ],
+      "camera": {
+        "zoom_start": 1,
+        "zoom_end": 1.065,
+        "pan_x": 0.008,
+        "pan_y": -0.018,
+        "easing": "ease_in_out"
+      },
+      "motion_profile": "fall"
+    },
+    "golden_dust": {
+      "description": "Organic golden particles with subtle sparkle",
+      "layers": [
+        {
+          "name": "golden-dust.svg",
+          "opacity": 0.38,
+          "scale": 1.12,
+          "depth": "far",
+          "blur": 1.6
+        },
+        {
+          "name": "gold-sparkles.svg",
+          "opacity": 0.66,
+          "scale": 1,
+          "depth": "near",
+          "blur": 0
+        }
+      ],
+      "camera": {
+        "zoom_start": 1,
+        "zoom_end": 1.045,
+        "pan_x": 0.012,
+        "pan_y": 0.004,
+        "easing": "ease_out"
+      },
+      "motion_profile": "float"
+    },
+    "moonlight": {
+      "description": "Soft halo, bokeh and starfield for night/meditative mood",
+      "layers": [
+        {
+          "name": "moon-halo.svg",
+          "opacity": 0.4,
+          "scale": 1.18,
+          "depth": "far",
+          "blur": 2.2
+        },
+        {
+          "name": "soft-bokeh.svg",
+          "opacity": 0.28,
+          "scale": 1.25,
+          "depth": "far",
+          "blur": 2.8
+        },
+        {
+          "name": "starfield.svg",
+          "opacity": 0.46,
+          "scale": 1,
+          "depth": "mid",
+          "blur": 0
+        }
+      ],
+      "camera": {
+        "zoom_start": 1,
+        "zoom_end": 1.035,
+        "pan_x": 0,
+        "pan_y": 0.012,
+        "easing": "ease_in_out"
+      },
+      "motion_profile": "breathe"
+    },
+    "light_rays": {
+      "description": "Ambient light rays with gentle intensity variation",
+      "layers": [
+        {
+          "name": "light-rays.svg",
+          "opacity": 0.36,
+          "scale": 1.1,
+          "depth": "far",
+          "blur": 1.1
+        },
+        {
+          "name": "golden-dust.svg",
+          "opacity": 0.32,
+          "scale": 1.05,
+          "depth": "mid",
+          "blur": 0.9
+        }
+      ],
+      "camera": {
+        "zoom_start": 1,
+        "zoom_end": 1.055,
+        "pan_x": -0.01,
+        "pan_y": 0,
+        "easing": "ease_in_out"
+      },
+      "motion_profile": "pulse_slow"
+    },
+    "zen_frame": {
+      "description": "Subtle bamboo and ornamental framing",
+      "layers": [
+        {
+          "name": "bamboo-framing.svg",
+          "opacity": 0.7,
+          "scale": 1,
+          "depth": "near",
+          "blur": 0
+        },
+        {
+          "name": "ornamental-corners.svg",
+          "opacity": 0.62,
+          "scale": 1,
+          "depth": "near",
+          "blur": 0
+        }
+      ],
+      "camera": {
+        "zoom_start": 1,
+        "zoom_end": 1.025,
+        "pan_x": 0,
+        "pan_y": 0,
+        "easing": "linear"
+      },
+      "motion_profile": "static"
+    },
+    "lotus_calm": {
+      "description": "Lotus silhouettes and water ripples for meditation",
+      "layers": [
+        {
+          "name": "lotus-silhouettes.svg",
+          "opacity": 0.48,
+          "scale": 1.06,
+          "depth": "mid",
+          "blur": 0.6
+        },
+        {
+          "name": "water-ripples.svg",
+          "opacity": 0.33,
+          "scale": 1.12,
+          "depth": "near",
+          "blur": 0
+        }
+      ],
+      "camera": {
+        "zoom_start": 1,
+        "zoom_end": 1.04,
+        "pan_x": 0,
+        "pan_y": -0.014,
+        "easing": "ease_in_out"
+      },
+      "motion_profile": "drift"
+    }
+  },
+  "course_mapping": {
+    "Tarot": "moonlight",
+    "Reiki": "light_rays",
+    "Meditación": "lotus_calm",
+    "Aromaterapia": "golden_dust",
+    "Flores de Bach": "sakura_fall"
+  },
+  "style_variants": {
+    "A": {
+      "name": "cinematografico_emocional",
+      "description": "Paisajes, calma y música. Prioriza atmósfera.",
+      "preferred_presets": [
+        "sakura_fall",
+        "moonlight",
+        "lotus_calm"
+      ]
+    },
+    "B": {
+      "name": "educativo",
+      "description": "Presentación breve de un curso y su temática.",
+      "preferred_presets": [
+        "light_rays",
+        "zen_frame",
+        "golden_dust"
+      ]
+    },
+    "C": {
+      "name": "conversion",
+      "description": "Invitación clara a descubrir los cursos de YUNA Academy.",
+      "preferred_presets": [
+        "golden_dust",
+        "sakura_fall",
+        "moonlight"
+      ]
+    }
+  }
+}
