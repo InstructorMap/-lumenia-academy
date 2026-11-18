@@ -1,0 +1,167 @@
+name: YUNA Creative Studio V4
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: "Deterministic seed (leave empty for week-based)"
+        required: false
+        default: ""
+      style:
+        description: "Commercial style A=emotional B=educational C=conversion"
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - A
+          - B
+          - C
+      course:
+        description: "Force a course"
+        required: false
+        default: ""
+        type: choice
+        options:
+          - ""
+          - Tarot
+          - Reiki
+          - Meditación
+          - Aromaterapia
+          - Flores de Bach
+      quick_test:
+        description: "Generate only one 8-second test clip"
+        required: false
+        default: "false"
+        type: boolean
+      skip_music:
+        description: "Skip YUNA Sound generation"
+        required: false
+        default: "false"
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            ffmpeg \
+            libcairo2 \
+            libpango-1.0-0 \
+            libpangocairo-1.0-0 \
+            libgdk-pixbuf2.0-0 \
+            shared-mime-info \
+            fonts-dejavu-core \
+            fonts-liberation
+
+      - name: Install Python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install pillow cairosvg
+
+      - name: Verify SVG overlays present
+        run: |
+          ls -la creative-studio/resources/overlays/
+          test -n "$(ls -A creative-studio/resources/overlays/*.svg 2>/dev/null)" || {
+            echo "ERROR: No SVG overlays found"
+            exit 1
+          }
+
+      - name: Verify photographic backgrounds
+        run: |
+          ls creative-studio/resources/ia/fondos/*.png | head -5
+          count=$(ls creative-studio/resources/ia/fondos/*.png 2>/dev/null | wc -l)
+          echo "Backgrounds found: $count"
+          test "$count" -ge 3 || { echo "Need at least 3 backgrounds"; exit 1; }
+
+      - name: Guard — never use PNG transparentes as decorative layers
+        run: |
+          # Soft check: the pipeline itself never references the folder.
+          # We only confirm the engine code does not contain the forbidden path.
+          if grep -r "transparentes" creative-studio/scripts/ --include="*.py" | grep -v "assert_no_png\|disabled\|forbidden\|never"; then
+            echo "WARNING: possible reference to transparentes/ found — review required"
+          else
+            echo "OK: no production use of transparentes/ PNG overlays"
+          fi
+
+      - name: Run SVG engine smoke test
+        run: |
+          python creative-studio/scripts/svg_engine.py
+
+      - name: Produce content
+        env:
+          YUNA_SEED: ${{ github.event.inputs.seed }}
+        run: |
+          ARGS="--seed ${{ github.event.inputs.seed || '0' }}"
+          if [ -z "${{ github.event.inputs.seed }}" ]; then
+            ARGS="--seed $(date -u +%G%V)"
+          fi
+          if [ "${{ github.event.inputs.quick_test }}" = "true" ]; then
+            ARGS="$ARGS --quick-test"
+          fi
+          if [ "${{ github.event.inputs.skip_music }}" = "true" ]; then
+            ARGS="$ARGS --skip-music"
+          fi
+          if [ -n "${{ github.event.inputs.style }}" ]; then
+            ARGS="$ARGS --style ${{ github.event.inputs.style }}"
+          fi
+          if [ -n "${{ github.event.inputs.course }}" ]; then
+            ARGS="$ARGS --course '${{ github.event.inputs.course }}'"
+          fi
+          echo "Running: python creative-studio/scripts/production_pipeline.py $ARGS"
+          python creative-studio/scripts/production_pipeline.py $ARGS
+
+      - name: Technical QA summary
+        run: |
+          echo "=== visual-qa.json ==="
+          cat creative-studio/generated/production/visual-qa.json || true
+          echo ""
+          echo "=== production.json (excerpt) ==="
+          python -c "
+          import json
+          from pathlib import Path
+          p = Path('creative-studio/generated/production/production.json')
+          if p.exists():
+              d = json.loads(p.read_text())
+              print('course:', d.get('course'))
+              print('style:', d.get('style'))
+              print('preset:', d.get('preset'))
+              print('publication_status:', d.get('publication_status'))
+              print('scenes:', len(d.get('scenes', [])))
+          "
+
+      - name: Upload artifacts (drafts only — never publish)
+        uses: actions/upload-artifact@v4
+        with:
+          name: yuna-creative-v4-drafts
+          path: |
+            creative-studio/generated/production/*.mp4
+            creative-studio/generated/production/*.json
+            creative-studio/generated/production/*.txt
+            creative-studio/generated/svg_cache/
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Final reminder
+        run: |
+          echo "============================================================"
+          echo "  DRAFTS GENERATED — HUMAN VISUAL REVIEW REQUIRED"
+          echo "  Do NOT publish automatically to YouTube or any network."
+          echo "  Official site: https://yuna-academy.vercel.app/"
+          echo "============================================================"
