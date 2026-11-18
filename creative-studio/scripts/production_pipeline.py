@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """YUNA Creative Studio: deterministic storyboard, QA and publishing drafts."""
 import argparse, hashlib, json, os, random, subprocess
+from io import BytesIO
 from datetime import datetime, timezone
 from pathlib import Path
 from PIL import Image, ImageOps, ImageDraw, ImageFont, ImageFilter
@@ -48,6 +49,12 @@ def main():
             if 65<bottom-top<210:
                 return im.crop((0,round(top*h/256),w,round(bottom*h/256)))
         return im
+    svg_overlays=sorted((STUDIO/"resources/overlays").glob("*.svg"))
+    try:
+        import cairosvg
+    except ImportError:
+        cairosvg=None
+    print("SVG overlay library:",len(svg_overlays),"renderer:",bool(cairosvg))
     transparent=[]
     for item in data["assets"]:
         if item["category"]!="overlay_candidate" or not (ROOT/item["path"]).exists():continue
@@ -87,6 +94,14 @@ def main():
                 for k in range(35):
                     x=rng.randrange(50,1030);y=rng.randrange(120,1450);r=rng.randrange(2,8)
                     draw.ellipse((x-r,y-r,x+r,y+r),fill=(255,212,161,rng.randrange(75,175)))
+            svg_id=None
+            if svg_overlays and cairosvg:
+                svg=svg_overlays[(n*3+shot)%len(svg_overlays)]
+                raster=Image.open(BytesIO(cairosvg.svg2png(url=str(svg),output_width=1080,output_height=1920))).convert("RGBA")
+                # Preserve SVG alpha, soften intensity, and avoid visual overload.
+                raster.putalpha(raster.getchannel("A").point(lambda v:round(v*.58)))
+                fg.alpha_composite(raster)
+                svg_id=svg.name
             fp=OUT/f"foreground-{n}-{shot}.png";fg.save(fp)
             tp=Image.new("RGBA",(1080,1920),(0,0,0,0))
             # A soft gradient preserves legibility without a hard horizontal card edge.
@@ -123,7 +138,7 @@ def main():
                  "-filter_complex",vf,"-map","[out]","-t","8","-r","24","-c:v","libx264","-preset","ultrafast","-crf","26",str(clip)])
             if not clip.exists() or clip.stat().st_size<100_000:raise SystemExit(f"Missing or empty animated scene: {clip}")
             clips.append(clip)
-            scenes.append({"asset":item["id"],"message":msg,"overlay":alpha_id})
+            scenes.append({"asset":item["id"],"message":msg,"overlay":alpha_id,"svg_overlay":svg_id})
         playlist=OUT/f"concat-{n}.txt"
         playlist.write_text("".join("file '"+c.name+"'\n" for c in clips))
         video=OUT/f"yuna-short-{n+1}.mp4"
@@ -140,7 +155,7 @@ def main():
         ok=ok and 23.5<=duration<=24.5 and len(clips)==3
         qa.append({"file":video.name,"passed":ok,"streams":sorted(kinds),"bytes":video.stat().st_size,"duration_seconds":round(duration,2),"animated_scenes":3})
     if not all(x["passed"] for x in qa):raise SystemExit("QA failed")
-    (OUT/"visual-qa.json").write_text(json.dumps({"transparent_overlays_available":len(transparent),"procedural_fallback_used":len(transparent)==0,"crop_audit":crop_audit,"shots_per_short":3,"requires_human_visual_approval":True},ensure_ascii=False,indent=2))
+    (OUT/"visual-qa.json").write_text(json.dumps({"transparent_overlays_available":len(transparent),"svg_overlays_available":len(svg_overlays),"svg_renderer_enabled":bool(cairosvg),"procedural_fallback_used":len(transparent)==0,"crop_audit":crop_audit,"shots_per_short":3,"requires_human_visual_approval":True},ensure_ascii=False,indent=2))
     record={"seed":a.seed,"created_at":datetime.now(timezone.utc).isoformat(),"course":course[0],"scenes":scenes,"qa":qa,"publication_status":"draft_requires_approval"}
     (OUT/"production.json").write_text(json.dumps(record,ensure_ascii=False,indent=2))
     (OUT/"publishing-draft.txt").write_text("YUNA Academy | "+course[0]+"\n"+course[1]+"\nConocé nuestros cursos: https://yuna-academy.vercel.app/\nCanal: https://www.youtube.com/@YunaSoundHolistic\nESTADO: BORRADOR, NO PUBLICADO\n",encoding="utf-8")
