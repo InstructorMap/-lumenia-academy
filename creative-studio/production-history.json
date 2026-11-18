@@ -340,6 +340,103 @@
         }
       ],
       "publication_status": "draft_requires_approval"
+    },
+    {
+      "seed": 202647,
+      "created_at": "2026-11-18T00:38:58.478724+00:00",
+      "course": "Meditación",
+      "scenes": [
+        {
+          "asset": "yuna-ia-04",
+          "message": "Encontrá tu espacio de calma",
+          "overlay": "svg-only",
+          "svg_overlay": "bamboo-framing.svg"
+        },
+        {
+          "asset": "yuna-ia-02",
+          "message": "Aprendé a tu ritmo",
+          "overlay": "svg-only",
+          "svg_overlay": "falling-leaves.svg"
+        },
+        {
+          "asset": "yuna-ia-07",
+          "message": "Explorá YUNA Academy",
+          "overlay": "svg-only",
+          "svg_overlay": "gold-sparkles.svg"
+        },
+        {
+          "asset": "yuna-ia-18",
+          "message": "Encontrá tu espacio de calma",
+          "overlay": "svg-only",
+          "svg_overlay": "golden-dust.svg"
+        },
+        {
+          "asset": "yuna-ia-16",
+          "message": "Aprendé a tu ritmo",
+          "overlay": "svg-only",
+          "svg_overlay": "light-rays.svg"
+        },
+        {
+          "asset": "yuna-ia-03",
+          "message": "Explorá YUNA Academy",
+          "overlay": "svg-only",
+          "svg_overlay": "lotus-silhouettes.svg"
+        },
+        {
+          "asset": "yuna-ia-14",
+          "message": "Encontrá tu espacio de calma",
+          "overlay": "svg-only",
+          "svg_overlay": "moon-halo.svg"
+        },
+        {
+          "asset": "yuna-ia-13",
+          "message": "Aprendé a tu ritmo",
+          "overlay": "svg-only",
+          "svg_overlay": "ornamental-corners.svg"
+        },
+        {
+          "asset": "yuna-ia-06",
+          "message": "Explorá YUNA Academy",
+          "overlay": "svg-only",
+          "svg_overlay": "petal-field.svg"
+        }
+      ],
+      "qa": [
+        {
+          "file": "yuna-short-1.mp4",
+          "passed": true,
+          "streams": [
+            "audio",
+            "video"
+          ],
+          "bytes": 2679579,
+          "duration_seconds": 24.0,
+          "animated_scenes": 3
+        },
+        {
+          "file": "yuna-short-2.mp4",
+          "passed": true,
+          "streams": [
+            "audio",
+            "video"
+          ],
+          "bytes": 2250203,
+          "duration_seconds": 24.0,
+          "animated_scenes": 3
+        },
+        {
+          "file": "yuna-short-3.mp4",
+          "passed": true,
+          "streams": [
+            "audio",
+            "video"
+          ],
+          "bytes": 2225533,
+          "duration_seconds": 24.0,
+          "animated_scenes": 3
+        }
+      ],
+      "publication_status": "draft_requires_approval"
     }
   ]
 }
