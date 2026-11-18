@@ -73,7 +73,7 @@ jobs:
       - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
-          pip install pillow cairosvg
+          pip install -r creative-studio/requirements-v4.txt numpy
 
       - name: Verify SVG overlays present
         run: |
