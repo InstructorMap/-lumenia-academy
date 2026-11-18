@@ -55,13 +55,8 @@ def main():
     except ImportError:
         cairosvg=None
     print("SVG overlay library:",len(svg_overlays),"renderer:",bool(cairosvg))
-    transparent=[]
-    for item in data["assets"]:
-        if item["category"]!="overlay_candidate" or not (ROOT/item["path"]).exists():continue
-        with Image.open(ROOT/item["path"]) as candidate:
-            if "A" in candidate.getbands() and candidate.getchannel("A").getextrema()[0]<245:
-                transparent.append(item)
-    print("Verified transparent layers:",len(transparent))
+    if not svg_overlays or not cairosvg:
+        raise SystemExit('SVG overlays or CairoSVG unavailable; PNG fallback disabled')
     # Three different 8-second shots per Short. Each shot contains a moving
     # background, an independently moving alpha layer and fading typography.
     for n in range(3):
@@ -74,34 +69,13 @@ def main():
                 crop_audit.append({"asset":item["id"],"original":list(original.size),"cropped":list(im.size),"crop_applied":im.size!=original.size})
             im=ImageOps.fit(im,(1080,1920),method=Image.Resampling.LANCZOS,centering=(.5,.45))
             base=OUT/f"background-{n}-{shot}.png";im.save(base,optimize=True)
-            fg=Image.new("RGBA",(1080,1920),(0,0,0,0))
-            alpha_id="procedural"
-            if transparent:
-                layer=transparent[(n+shot)%len(transparent)]
-                with Image.open(ROOT/layer["path"]) as raw:
-                    decal=raw.convert("RGBA")
-                    # Trim fully transparent margins before sizing the actual subject.
-                    bounds=decal.getchannel("A").point(lambda v:255 if v>18 else 0).getbbox()
-                    if bounds:decal=decal.crop(bounds)
-                    decal.thumbnail((570,540),Image.Resampling.LANCZOS)
-                    # Keep the decorative layer above the copy-safe lower third.
-                    opacity=decal.getchannel("A").point(lambda v:int(v*.76))
-                    decal.putalpha(opacity)
-                fg.alpha_composite(decal,(max(0,1080-decal.width-42),140+shot*95))
-                alpha_id=layer["id"]
-            else:
-                draw=ImageDraw.Draw(fg)
-                for k in range(35):
-                    x=rng.randrange(50,1030);y=rng.randrange(120,1450);r=rng.randrange(2,8)
-                    draw.ellipse((x-r,y-r,x+r,y+r),fill=(255,212,161,rng.randrange(75,175)))
-            svg_id=None
-            if svg_overlays and cairosvg:
-                svg=svg_overlays[(n*3+shot)%len(svg_overlays)]
-                raster=Image.open(BytesIO(cairosvg.svg2png(url=str(svg),output_width=1080,output_height=1920))).convert("RGBA")
-                # Preserve SVG alpha, soften intensity, and avoid visual overload.
-                raster.putalpha(raster.getchannel("A").point(lambda v:round(v*.58)))
-                fg.alpha_composite(raster)
-                svg_id=svg.name
+            fg=Image.new('RGBA',(1080,1920),(0,0,0,0))
+            svg=svg_overlays[(n*3+shot)%len(svg_overlays)]
+            raster=Image.open(BytesIO(cairosvg.svg2png(url=str(svg),output_width=1080,output_height=1920))).convert('RGBA')
+            raster.putalpha(raster.getchannel('A').point(lambda v:round(v*.68)))
+            fg.alpha_composite(raster)
+            svg_id=svg.name
+            alpha_id='svg-only'
             fp=OUT/f"foreground-{n}-{shot}.png";fg.save(fp)
             tp=Image.new("RGBA",(1080,1920),(0,0,0,0))
             # A soft gradient preserves legibility without a hard horizontal card edge.
@@ -155,7 +129,7 @@ def main():
         ok=ok and 23.5<=duration<=24.5 and len(clips)==3
         qa.append({"file":video.name,"passed":ok,"streams":sorted(kinds),"bytes":video.stat().st_size,"duration_seconds":round(duration,2),"animated_scenes":3})
     if not all(x["passed"] for x in qa):raise SystemExit("QA failed")
-    (OUT/"visual-qa.json").write_text(json.dumps({"transparent_overlays_available":len(transparent),"svg_overlays_available":len(svg_overlays),"svg_renderer_enabled":bool(cairosvg),"procedural_fallback_used":len(transparent)==0,"crop_audit":crop_audit,"shots_per_short":3,"requires_human_visual_approval":True},ensure_ascii=False,indent=2))
+    (OUT/"visual-qa.json").write_text(json.dumps({"transparent_overlays_available":0,"svg_overlays_available":len(svg_overlays),"svg_renderer_enabled":bool(cairosvg),"procedural_fallback_used":False,"crop_audit":crop_audit,"shots_per_short":3,"requires_human_visual_approval":True},ensure_ascii=False,indent=2))
     record={"seed":a.seed,"created_at":datetime.now(timezone.utc).isoformat(),"course":course[0],"scenes":scenes,"qa":qa,"publication_status":"draft_requires_approval"}
     (OUT/"production.json").write_text(json.dumps(record,ensure_ascii=False,indent=2))
     (OUT/"publishing-draft.txt").write_text("YUNA Academy | "+course[0]+"\n"+course[1]+"\nConocé nuestros cursos: https://yuna-academy.vercel.app/\nCanal: https://www.youtube.com/@YunaSoundHolistic\nESTADO: BORRADOR, NO PUBLICADO\n",encoding="utf-8")
